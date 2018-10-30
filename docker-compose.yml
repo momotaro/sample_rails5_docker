@@ -1,0 +1,27 @@
+version: '3'
+services:
+  app:
+    build: .
+    volumes:
+      - .:/var/www/anker-core:cached
+    ports:
+      - 3000:3000
+    links:
+      - db
+    command: >
+      bash -c "if [ -e tmp/pids/server.pid ]; then rm tmp/pids/server.pid ;fi \
+               && ./bin/bundle install \
+               && ./bin/bundle exec rails s -p 3000 -b '0.0.0.0'"
+  db:
+    image: mysql:5.7
+    ports:
+      - 3306:3306
+    restart: on-failure
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    environment:
+      MYSQL_DATABASE: anker
+      MYSQL_ROOT_PASSWORD: anker
+
+volumes:
+  bundle:
+    driver: local
